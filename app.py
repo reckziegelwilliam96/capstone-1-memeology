@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify
+import json
 import requests
 from flask_debugtoolbar import DebugToolbarExtension
 
@@ -11,6 +12,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+app.config['SECRET_KEY'] = 'iconicle-key'
 debug = DebugToolbarExtension(app)
 
 
@@ -23,11 +25,11 @@ def display_home():
 
     return render_template('homepage.html')
 
-@app.route('/render-game')
-def display_game():
-    """Show game page."""
+# @app.route('/render-game')
+# def display_game():
+#     """Show game page."""
 
-    return render_template('gamepage.html')
+#     return render_template('gamepage.html')
 
 @app.route('/api/get-images-list')
 def get_api_list_images():
@@ -39,5 +41,5 @@ def get_api_list_images():
     }
 
     response = requests.get(url, headers=headers)
-    print(response.text)
+    response = json.loads(response.text)
     return jsonify(response)

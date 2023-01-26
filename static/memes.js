@@ -1,11 +1,15 @@
 function processImagesList(){
     axios.get("/api/get-images-list")
         .then(response => handleListResponse(response.data))
-        .catch(error => console.log(error))
 }
 
-function handleListResponse(response){
-    console.log(response)
+// function redirectToGamePage(){
+//     window.location.href = '/render-game'
+// }
+
+function handleListResponse(response){  
+    $("#meme-results").text(JSON.stringify(response.text));
+    console.log(response.text)
 }
 
-$("#start-game").on("click", procesImagesList)
+$("#start-game").on("click", processImagesList)
