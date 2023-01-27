@@ -33,13 +33,13 @@ def display_home():
 
 @app.route('/api/get-images-list')
 def get_api_list_images():
-    url = "https://ronreiter-meme-genertor.p.rapidapi.com/images"
+    url = "https://ronreiter-meme-generator.p.rapidapi.com/images"
 
     headers = {
-        "X-RapidAPI-Key": "4107f9a719msh7b803084f28bdd6p10d9b2jsn4c84f0422879",
-        "X-RapidAPI-Host": "ronreiter-meme-generator.p.rapidapi.com"
+    	"X-RapidAPI-Key": "4107f9a719msh7b803084f28bdd6p10d9b2jsn4c84f0422879",
+    	"X-RapidAPI-Host": "ronreiter-meme-generator.p.rapidapi.com"
     }
 
-    response = requests.get(url, headers=headers)
-    response = json.loads(response.text)
-    return jsonify(response)
+    response = requests.request("GET", url, headers=headers)
+
+    return response.text
