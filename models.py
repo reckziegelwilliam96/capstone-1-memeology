@@ -18,7 +18,7 @@ class Memes(db.Model):
     meme_name = db.Column(db.Text,
                             nullable=False)
 
-class Words(db.Model):
+class MemeWords(db.Model):
     """Keywords of Memes."""
 
     __tablename__ = "memes_words"

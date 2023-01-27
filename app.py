@@ -1,9 +1,8 @@
 from flask import Flask, render_template, jsonify
-import json
-import requests
+import requests, random
 from flask_debugtoolbar import DebugToolbarExtension
 
-from models import db, connect_db
+from models import db, connect_db, Memes, MemeWords
 
 app = Flask(__name__)
 
@@ -41,5 +40,30 @@ def get_api_list_images():
     }
 
     response = requests.request("GET", url, headers=headers)
+
+    image_list = response.text
+    phrases = image_list.split(',')
+    """get a sample of image_list"""
+    random_indices = random.sample(range(len(phrases)), 20)
+    print(random_indices)
+    random_images = [phrases[i] for i in random_indices]
+    print(random_images)
+
+    """separate image list into phrases for Meme class and words for MemeWords class"""
+    
+    # result=[]
+    # for phrase in phrases:
+    #     cleaned_phrase = phrase.replace('"','')
+    #     print(cleaned_phrase)
+    #     # meme = Memes(meme_name=cleaned_phrase)
+    #     # db.session.add(meme)
+    #     # db.session.commit()
+    #     words = cleaned_phrase.split('-')
+    #     for word in words:
+    #         # MemeWords(word=word, meme_id=meme.id)
+    #         print(word)
+    #     print(words)
+    #     result.append(words)
+    # print(result)
 
     return response.text

@@ -8,12 +8,13 @@ function processImagesList(){
 // }
 
 function handleListResponse(response){
+    console.log(response)
     let filteredResponse = extractWords(response);
     $("#meme-results").html(filteredResponse);
 }
 
 function extractWords(response) {
-    let words = response.map(item => item.word);
+    let words = response.map(item => item.name);
     let splitWords = [];
     
     words.forEach(function(word) {
@@ -23,6 +24,13 @@ function extractWords(response) {
     });
   
     return splitWords;
+
+    // let allWords = []
+    // response.data.forEach(function(image){
+    //     let words =  image.word.replace(/'/g, "").split("-");
+    //     allWords.push(words);
+    // });
+    // return allWords;
 }
 
 $("#start-game").on("click", processImagesList)
