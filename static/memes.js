@@ -1,36 +1,35 @@
-function processImagesList(){
+function getAPIImageList(){
     axios.get("/api/get-images-list")
-        .then(response => handleListResponse(response.data))
+        .then(response => parseList(response.data))
 }
 
-// function redirectToGamePage(){
-//     window.location.href = '/render-game'
-// }
 
-function handleListResponse(response){
-    console.log(response)
-    let filteredResponse = extractWords(response);
-    $("#meme-results").html(filteredResponse);
-}
-
-function extractWords(response) {
-    let words = response.map(item => item.name);
-    let splitWords = [];
+function parseList(response){
     
-    words.forEach(function(word) {
-      word = word.replace(/'/g, ""); // remove apostrophes
-      let wordArray = word.split("-"); // split phrase by dash
-      splitWords.push(wordArray);
-    });
-  
-    return splitWords;
+    var phrases = response.split(',');
+    var randomIndices = getRandomIndices(phrases.length, 20);
 
-    // let allWords = []
-    // response.data.forEach(function(image){
-    //     let words =  image.word.replace(/'/g, "").split("-");
-    //     allWords.push(words);
-    // });
-    // return allWords;
+    var randomImages = randomIndices.map(function(i) {
+        return phrases[i];
+    });
+
+    axios.post('http://127.0.0.1:500/add-images-to-db', {
+        data: randomImages
+    })
+        .then(response => getAPImeme(response.data))
+
 }
+
+function getRandomIndices(length, number) {
+    var indices = [];
+    while (indices.length < number) {
+        var randomIndex = Math.floor(Math.random() * length);
+            if (!indices.includes(randomIndex)) {
+            indices.push(randomIndex);
+            }
+    }
+    return indices;
+}
+
 
 $("#start-game").on("click", processImagesList)
