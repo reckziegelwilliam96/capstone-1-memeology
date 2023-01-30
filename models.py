@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class Memes(db.Model):
+class Meme(db.Model):
     """Memes."""
 
     __tablename__ = "database_memes"
@@ -17,6 +17,8 @@ class Memes(db.Model):
 
     meme_name = db.Column(db.Text,
                             nullable=False)
+    
+    meme_words = db.Relationship('MemeWords', backref='meme')
 
 class MemeWords(db.Model):
     """Keywords of Memes."""
