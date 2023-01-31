@@ -40,8 +40,13 @@ class Images(db.Model):
     image_data = db.Column(db.Text,
                     nullable=True)
     
-    image_words = db.Relationship('MemeWords', backref='meme')
+    image_words = db.Relationship('ImageWords', backref='images')
 
+    guessed_images = db.Relationship('GuessedImages', backref='database_images')
+
+    generated_memes = db.Relationship('GeneratedMemes', backref='database_images')
+
+    in_progress_images = db.Relationship('InProgessImages', backref='database_images') 
 
 class ImageWords(db.Model):
     """Meme Image Keywords."""
@@ -72,6 +77,8 @@ class GuessedImages(db.Model):
     
     status = db.Column(db.Integer,
                         db.ForeignKey("in_progress_images.status"))
+
+    guessed_by = db.Relationship('User', backref='users')
 
 class InProgessImages(db.Model):
     """Incoplete User Guesses."""
@@ -109,7 +116,8 @@ class GeneratedMemes(db.Model):
     
     is_favorite = db.Column(db.Boolean,
                         nullable=False)
-    
+
+    generated_by = db.Relationship('Users', backref='generated_memes')
                         
 def connect_db(app):
     """Connect to database."""
