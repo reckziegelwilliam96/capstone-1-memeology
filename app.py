@@ -1,8 +1,13 @@
-from flask import Flask, render_template, request, session
-import requests, random
+from flask import Flask, g, render_template, request, session, flash, redirect
 from flask_debugtoolbar import DebugToolbarExtension
+from sqlalchemy.exc import IntegrityError
 
-from models import db, connect_db, Meme, MemeWords
+from forms import UserAddForm, LoginForm
+from models import db, connect_db, User, Images, ImageWords
+
+import requests, random
+
+CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
 
@@ -17,12 +22,100 @@ debug = DebugToolbarExtension(app)
 
 connect_db(app)
 db.create_all()
+##*************************************************************************************************##
+
+@app.before_request
+def add_user_to_g():
+    """If logged in, add user to global G variable."""
+
+    if CURR_USER_KEY in session:
+        g.user = User.query.get(session[CURR_USER_KEY])
+
+    else:
+        g.user = None
+
+def do_login(user):
+    """Log in user."""
+
+    session[CURR_USER_KEY] = user.id
+
+def do_logout():
+    """Log out user."""
+
+    if CURR_USER_KEY in session:
+        del session[CURR_USER_KEY]
+
+
+@app.route('/signup', methods=["GET", "POST"])
+def sign_up():
+    """Handle user signup."""
+
+    form = AddUserForm()
+
+    if form.validate_on_submit():
+        try:
+            user = User.signup(
+                username=form.username.data,
+                password=form.password.data,
+                email=form.email.data
+            )
+            db.session.commit()
+
+        except IntegrityError:
+            flash('Username taken', 'danger')
+            return render_template('users/signup.html', form-form)
+        
+        do_login(user)
+
+        return redirect('/')
+    
+    else:
+        return render_template('users/signup.html', form=form)
+
+@app.route('/login', methods=["POST", "GET"])
+def login():
+    """Handle user login."""
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        user = User.authenticate(form.username.data,
+                                form.password.data)
+        
+        if user:
+            do_login(user)
+            flash(f"Welcome back, {user.username}", 'success')
+
+            return redirect('/')
+
+        flash("Invalid credentials", 'danger')
+
+    return render_template('/users/login.html')
+
+@app.route('/logout')
+def logout():
+    """Handle user logout."""
+    user = g.user
+
+    if user:
+        do_logout()
+        flash(f"Until next time, {user.username}!", 'success')
+
+        return redirect('/')
+
+    form = UserAddForm()
+    return render_template("users/signup.html", form=form)
+
+##*************************************************************************************************##
 
 @app.route('/')
-def display_home():
+def homepage():
     """Show home page."""
+    if g.user:
+        return render_template('home.html')
 
-    return render_template('homepage.html')
+    else:
+
 
 ##*************************************************************************************************##
 
@@ -92,7 +185,7 @@ def post_meme_names_seed_iconicle_db():
         random_images = request.get_json()
         try:
             for meme_name in random_images:
-                meme = Meme(meme_name=meme_name)
+                meme = Images(meme_name=meme_name)
                 db.session.add(meme)
                 db.session.commit()
                 for phrase in meme_name:
@@ -101,7 +194,7 @@ def post_meme_names_seed_iconicle_db():
                         words = cleaned_phrase.split('-')
                         for word in words:
                             try:
-                                meme_word = MemeWords(word=word, meme_id=meme.id)
+                                meme_word = ImageWords(word=word, meme_id=meme.id)
                                 db.session.add(meme_word)
                                 db.session.commit()
 
