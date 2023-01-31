@@ -5,25 +5,48 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class Meme(db.Model):
-    """Memes."""
+class Users(db.Model):
+    """Game User."""
 
-    __tablename__ = "database_memes"
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer,
+                    primary_key=True,
+                    unique=True,
+                    nullable=False)
+        
+    username = db.Column(db.Text,
+                        nullable=False)
+    
+    password = db.Column(db.Text,
+                        nullable=False)
+
+    email = db.Column(db.Text,
+                        nullable=False)
+
+class Images(db.Model):
+    """Meme Images."""
+
+    __tablename__ = "database_images"
 
     id = db.Column(db.Integer,
                     primary_key=True,
                     unique=True,
                     nullable=False)
 
-    meme_name = db.Column(db.Text,
-                            nullable=False)
+    phrase = db.Column(db.Text,
+                    nullable=False)
     
-    meme_words = db.Relationship('MemeWords', backref='meme')
+    image_data = db.Column(db.Text,
+                    nullable=True)
+    
+    image_words = db.Relationship('MemeWords', backref='meme')
 
-class MemeWords(db.Model):
-    """Keywords of Memes."""
 
-    __tablename__ = "memes_words"
+class ImageWords(db.Model):
+    """Meme Image Keywords."""
+
+    __tablename__ = "image_words"
 
     id = db.Column(db.Integer,
                     primary_key=True,
@@ -33,8 +56,60 @@ class MemeWords(db.Model):
     word = db.Column(db.Text,
                     nullable=False)
     
-    meme_id = db.Column(db.Integer,
-                        db.ForeignKey("database_memes.id"))
+    image_id = db.Column(db.Integer,
+                        db.ForeignKey("database_images.id"))
+
+class GuessedImages(db.Model):
+    """Images with User Guesses."""
+
+    __tablename__ = "guessed_images"
+
+    image_id = db.Column(db.Integer,
+                        db.ForeignKey("database_images.id"))
+
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.id"))
+    
+    status = db.Column(db.Integer,
+                        db.ForeignKey("in_progress_images.status"))
+
+class InProgessImages(db.Model):
+    """Incoplete User Guesses."""
+
+    __tablename__ = "in_progess_images"
+
+    id = db.Column(db.Integer,
+                    primary_key=True,
+                    unique=True,
+                    nullable=False)
+    
+    image_id = db.Column(db.Integer,
+                        db.ForeignKey("database_images.id"))
+    
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.id"))
+    
+    status = db.Column(db.Integer,
+                        nullable=False)
+
+class GeneratedMemes(db.Model):
+
+    __tablename__ = "generated_memes"
+
+    id = db.Column(db.Integer,
+                    primary_key=True,
+                    unique=True,
+                    nullable=False)
+
+    image_id = db.Column(db.Integer,
+                        db.ForeignKey("database_images.id"))
+
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.id"))
+    
+    is_favorite = db.Column(db.Boolean,
+                        nullable=False)
+    
                         
 def connect_db(app):
     """Connect to database."""

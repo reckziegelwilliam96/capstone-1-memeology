@@ -34,13 +34,17 @@ function getRandomIndices(length, number) {
     return indices;
 }
 
+/*************************************************************************************************************/
+
 //Request function to API Meme Generator endpoint, get MemeImage
 function getAPIGenerateMeme(){
     axios.get("/api/get-generate-meme")
         .then(response => handleMeme(response.data))
 }
 
-function handleMeme(response)
+function handleMeme(response){
+
+}
 
 
 $("#start-game").on("click", getAPIImageList)
