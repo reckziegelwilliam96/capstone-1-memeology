@@ -50,7 +50,7 @@ def do_logout():
 def sign_up():
     """Handle user signup."""
 
-    form = AddUserForm()
+    form = UserAddForm()
 
     if form.validate_on_submit():
         try:
@@ -111,10 +111,9 @@ def logout():
 @app.route('/')
 def homepage():
     """Show home page."""
-    if g.user:
-        return render_template('home.html')
+    
+    return render_template('home.html')
 
-    else:
 
 
 ##*************************************************************************************************##
