@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from forms import UserAddForm, LoginForm
 from models import db, connect_db, User, Images, ImageWords
 
-import requests, random
+import requests, random, base64
 
 CURR_USER_KEY = "curr_user"
 
@@ -132,6 +132,7 @@ def get_api_list_images():
     try:
         response = requests.request("GET", url, headers=headers)
         response.raise_for_status()
+
         return response.text
 
     except requests.exceptions.HTTPError as http_err:
@@ -163,7 +164,15 @@ def get_api_generate_meme():
     
     try:
         response = requests.request("GET", url, headers=headers, params=querystring)
-        print(response.text)
+        response_content = response.content
+        
+        image = Images.query.filter_by(phrase=meme)
+        image.image_data = response_content
+        db.session.commit()
+
+        b64_encoded_image = base64.b64encode(response_content).decode('utf-8')
+
+        
 
     except requests.exceptions.HTTPError as http_err:
         print(f'HTTP error occured: {http_err}')
@@ -172,6 +181,8 @@ def get_api_generate_meme():
     except Exception as e:
         print(f'An error occurred:{e}')
 
+    return b64_encoded_image
+
 ##*************************************************************************************************##
 
 @app.route('/api/post-meme-names-seed-db', methods=["POST"])
@@ -179,38 +190,30 @@ def post_meme_names_seed_iconicle_db():
     """Seed database with post request from JS file, 
     parse random_images phrases into Meme class, 
     parse again into MemeWords class """
+    
 
     try:
         random_images = request.get_json()
-        try:
-            for meme_name in random_images:
-                meme = Images(meme_name=meme_name)
-                db.session.add(meme)
+        
+        for image_phrase in random_images:
+            created_image = Images(phrase=image_phrase)
+            db.session.add(created_image)
+            db.session.commit()
+
+            words = image_phrase.split("-")
+            for word in words:
+                print(f"created_image type:{type(created_image)}")
+                image_word = ImageWords(word=word, image_id=created_image.id)
+                db.session.add(image_word)
                 db.session.commit()
-                for phrase in meme_name:
-                    try:
-                        cleaned_phrase = phrase.replace('"','')
-                        words = cleaned_phrase.split('-')
-                        for word in words:
-                            try:
-                                meme_word = ImageWords(word=word, meme_id=meme.id)
-                                db.session.add(meme_word)
-                                db.session.commit()
-
-                            except Exception as e:
-                                print(f"Error adding word {word} to the database: {e}")
-                                db.session.rollback()
-                    except Exception as e:
-                        print(f"Error cleaning phrase {phrase}: {e}")
-                        db.session.rollback()
-        except Exception as e:
-            print(f"Error adding meme {meme_name} to the database: {e}")
-            db.session.rollback()
     except Exception as e:
-        print(f"Error getting data from request: {e}")
-        return "Error getting data from request", 500
+        print(f"Error processing data: {e}")
+        db.session.rollback()
+        return "Error processing data", 500
 
-    session['meme'] = random.choice(random_images)
 
+    response = random.choice(random_images)
+    session['meme'] = response
+    return response
 
    

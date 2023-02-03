@@ -68,7 +68,7 @@ class Images(db.Model):
     phrase = db.Column(db.Text,
                     nullable=False)
     
-    image_data = db.Column(db.Text,
+    image_data = db.Column(db.LargeBinary,
                     nullable=True)
     
     image_words = db.relationship('ImageWords', backref='images')
@@ -78,6 +78,7 @@ class Images(db.Model):
     generated_memes = db.relationship('GeneratedMemes', backref='database_images')
 
     in_progress_images = db.relationship('InProgessImages', backref='database_images') 
+
 
 class ImageWords(db.Model):
     """Meme Image Keywords class."""

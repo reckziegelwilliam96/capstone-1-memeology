@@ -7,26 +7,33 @@ function getAPIImageList(){
 }
 
 //Manipulate data to clean it, select random meme phrases and send data to be committed to db
+
 function handleList(response){
-    var phrases = response.split(',');
-    var randomIndices = getRandomIndices(phrases.length, 20);
+   let phrases = response.toString().split(',')
+   let randomIndices = getRandomIndices(phrases.length, 20);
 
-    var randomMemeNames = randomIndices.map(function(i) {
-        return phrases[i];
-    });
+   let randomImageNames = randomIndices.map(function(i) {
+       return phrases[i];
+   });
 
-    axios.post('http://127.0.0.1:500/add-images-to-db', {
-        data: randomMemeNames
-    })
-        .then(response => getAPImeme(response.data))
-
+   axios.post('/api/post-meme-names-seed-db', randomImageNames, {
+       headers: {
+           'Content-Type': 'application/json'
+       }
+   }).then(response => {
+       if (response.data.error) {
+           console.log(response.data.error)
+       } else {
+           getAPIGenerateMeme(response.data)
+       }
+   })
 }
 
 //Additional function for handleList, to select random indices from response list
 function getRandomIndices(length, number) {
-    var indices = [];
+    let indices = [];
     while (indices.length < number) {
-        var randomIndex = Math.floor(Math.random() * length);
+        let randomIndex = Math.floor(Math.random() * length);
             if (!indices.includes(randomIndex)) {
             indices.push(randomIndex);
             }
@@ -37,13 +44,34 @@ function getRandomIndices(length, number) {
 /*************************************************************************************************************/
 
 //Request function to API Meme Generator endpoint, get MemeImage
-function getAPIGenerateMeme(){
-    axios.get("/api/get-generate-meme")
+function getAPIGenerateMeme(image){
+    const options = {
+        method: 'GET',
+        url: 'https://ronreiter-meme-generator.p.rapidapi.com/meme',
+        params: {
+          top: '.',
+          bottom: '.',
+          meme: `${image}`,
+          font_size: '1',
+          font: 'Impact'
+        },
+        headers: {
+          'X-RapidAPI-Key': '4107f9a719msh7b803084f28bdd6p10d9b2jsn4c84f0422879',
+          'X-RapidAPI-Host': 'ronreiter-meme-generator.p.rapidapi.com'
+        }
+      };
+      
+    axios.request(options)
         .then(response => handleMeme(response.data))
+        .catch(function (error) {
+          console.error(error);
+      });
+    // axios.get("/api/get-generate-meme")
+        // .then(response => handleMeme(response.data))
 }
 
 function handleMeme(response){
-
+    $("#meme-results").append(response)
 }
 
 
