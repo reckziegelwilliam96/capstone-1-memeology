@@ -1,5 +1,6 @@
 """Models for Iconicle app."""
 
+from re import M
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import bcrypt
 
@@ -62,7 +63,6 @@ class Images(db.Model):
 
     id = db.Column(db.Integer,
                     primary_key=True,
-                    unique=True,
                     nullable=False)
 
     phrase = db.Column(db.Text,
@@ -101,15 +101,18 @@ class GuessedImages(db.Model):
 
     __tablename__ = "guessed_images"
 
+    id = db.Column(db.Integer,
+                    primary_key=True,
+                    unique=True,
+                    nullable=False)
+
     image_id = db.Column(db.Integer,
-                        db.ForeignKey("database_images.id"),
-                        primary_key=True)
+                        db.ForeignKey("database_images.id"))
 
     user_id = db.Column(db.Integer,
-                        db.ForeignKey("users.id"),
-                        primary_key=True)
+                        db.ForeignKey("users.id"))
     
-    status = db.Column(db.Text,
+    status = db.Column(db.Integer,
                         nullable=True)
 
     guessed_by = db.relationship('User', backref='users')
@@ -130,8 +133,6 @@ class InProgessImages(db.Model):
     user_id = db.Column(db.Integer,
                         db.ForeignKey("users.id"))
     
-    status = db.Column(db.Text, 
-                        db.ForeignKey("guessed_images.status"))
 
 class GeneratedMemes(db.Model):
     """Generated Memes from Images class."""
@@ -150,7 +151,7 @@ class GeneratedMemes(db.Model):
                         db.ForeignKey("users.id"))
     
     is_favorite = db.Column(db.Boolean,
-                        nullable=False)
+                        nullable=True)
 
     generated_by = db.relationship('User', backref='generated_memes')
                         

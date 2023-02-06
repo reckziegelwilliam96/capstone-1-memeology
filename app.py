@@ -142,47 +142,6 @@ def get_api_list_images():
     except Exception as e:
         print(f'An error occurred:{e}')
 
-@app.route('/api/get-generate-meme')
-def get_api_generate_meme():
-    """Get random meme from session 
-    using predefined images in API Meme Generator."""
-    meme = session['meme']
-
-    url = "https://ronreiter-meme-generator.p.rapidapi.com/meme"
-
-    querystring = {"top":".",
-                    "bottom":".",
-                    "meme":f"{meme}",
-                    "font_size":"1",
-                    "font":"Impact"
-                    }
-
-    headers = {
-	    "X-RapidAPI-Key": "4107f9a719msh7b803084f28bdd6p10d9b2jsn4c84f0422879",
-	    "X-RapidAPI-Host": "ronreiter-meme-generator.p.rapidapi.com"
-    }
-    
-    try:
-        response = requests.request("GET", url, headers=headers, params=querystring)
-        response_content = response.content
-        
-        image = Images.query.filter_by(phrase=meme)
-        image.image_data = response_content
-        db.session.commit()
-
-        b64_encoded_image = base64.b64encode(response_content).decode('utf-8')
-
-        
-
-    except requests.exceptions.HTTPError as http_err:
-        print(f'HTTP error occured: {http_err}')
-    except requests.exceptions.RequestException as req_err:
-        print(f'Request error occured: {req_err}')
-    except Exception as e:
-        print(f'An error occurred:{e}')
-
-    return b64_encoded_image
-
 ##*************************************************************************************************##
 
 @app.route('/api/post-meme-names-seed-db', methods=["POST"])
@@ -216,4 +175,35 @@ def post_meme_names_seed_iconicle_db():
     session['meme'] = response
     return response
 
-   
+@app.route('/api/get-generate-meme')
+def get_api_generate_meme():
+    """Get random meme from session 
+    using predefined images in API Meme Generator."""
+    meme = session['meme']
+
+    url = "https://ronreiter-meme-generator.p.rapidapi.com/meme"
+
+    querystring = {"top":".",
+                    "bottom":".",
+                    "meme":f"{meme}",
+                    "font_size":"1",
+                    "font":"Impact"
+                    }
+
+    headers = {
+	    "X-RapidAPI-Key": "4107f9a719msh7b803084f28bdd6p10d9b2jsn4c84f0422879",
+	    "X-RapidAPI-Host": "ronreiter-meme-generator.p.rapidapi.com"
+    }
+    
+    try:
+        response = requests.request("GET", url, headers=headers, params=querystring)
+        
+    except requests.exceptions.HTTPError as http_err:
+        print(f'HTTP error occured: {http_err}')
+    except requests.exceptions.RequestException as req_err:
+        print(f'Request error occured: {req_err}')
+    except Exception as e:
+        print(f'An error occurred:{e}')
+
+    return response.content, 200, {'Content-Type': 'application/octet-stream'}
+
