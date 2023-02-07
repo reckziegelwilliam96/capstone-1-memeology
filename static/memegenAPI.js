@@ -1,3 +1,4 @@
+//API Meme Generator requests: External API to Flask Backend App.py
 $(document).ready(function(){
     getAPIImageList();
 })
@@ -11,7 +12,7 @@ function getAPIImageList(){
 
 //Manipulate data to clean it, select random meme phrases and send data to be committed to db
 
-function handleList(response){
+async function handleList(response){
    let phrases = response.toString().split(',')
    let randomIndices = getRandomIndices(phrases.length, 1);
 
@@ -25,7 +26,8 @@ function handleList(response){
        }
    }).then(response => {
        console.log(response.data.error)
-});
+})
+};
 
 //Additional function for handleList, to select random indices from response list
 function getRandomIndices(length, number) {
@@ -48,16 +50,26 @@ function getAPIGenerateMeme() {
         responseType: 'blob'
     })
         .then(response => handleMeme(response.data))
-  }
+}
   
-  function handleMeme(response) {
+async function handleMeme(response) {
+
     const blob = new Blob([response], {
       type: 'image/jpeg'
     });
-    const objectURL = URL.createObjectURL(blob);
-    const image = new Image();
-    image.src = objectURL;
-    $("#meme-results").append(image);
-  }
+
+    const file = new File([blob], 'meme.jpeg', {type: 'image/jpeg' });
+    const formData = new FormData();
+    formData.append('meme', file);
+
+    try {
+        const response = await axios.post('/save-meme', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        console.log(response.data);
+    } catch (error) {
+        console.error(error)
+    }
 }
-/*************************************************************************************************************/

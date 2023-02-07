@@ -1,11 +1,14 @@
-from flask import Flask, g, render_template, request, session, flash, redirect
+from flask import Flask, g, render_template, request, session, flash, redirect, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
+import os
+
 from sqlalchemy.exc import IntegrityError
+from werkzeug.utils import secure_filename
 
 from forms import UserAddForm, LoginForm
 from models import db, connect_db, User, Images, ImageWords
 
-import requests, random, base64
+import requests, random
 
 CURR_USER_KEY = "curr_user"
 
@@ -13,7 +16,7 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///iconicle-app'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_ECHO'] = False
 
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = 'iconicle-key'
@@ -90,7 +93,7 @@ def login():
 
         flash("Invalid credentials", 'danger')
 
-    return render_template('/users/login.html')
+    return render_template('/users/login.html', form=form)
 
 @app.route('/logout')
 def logout():
@@ -107,16 +110,40 @@ def logout():
     return render_template("users/signup.html", form=form)
 
 ##*************************************************************************************************##
-
+##DISPLAY ROUTES##
 @app.route('/')
 def homepage():
     """Show home page."""
-    
     return render_template('home.html')
 
+##*************************************************************************************************##
+##GAMEPLAY ROUTES##
+
+@app.route("/save-meme", methods=["POST"])
+def save_meme():
+    
+    if "meme" in request.files:
+        file = request.files["meme"]
+        if file:
+            meme = session["meme"]
+            print(meme)
+            filename = f"{meme}_{secure_filename(file.filename)}"
+            file.save(os.path.join("images", filename))
+            response = jsonify({"message": "Meme saved successfully"})
+            response.status_code = 200
+            return response
+        else:
+            response = jsonify({"error": "File not found in the request"})
+            response.status_code = 400
+            return response
+    else:
+        response = jsonify({"error": "Meme field not found in the request"})
+        response.status_code = 400
+        return response
 
 
 ##*************************************************************************************************##
+##EXTERN API: RAPID API'S MEME GENERATOR ROUTES##
 
 @app.route('/api/get-images-list')
 def get_api_list_images():
@@ -142,7 +169,44 @@ def get_api_list_images():
     except Exception as e:
         print(f'An error occurred:{e}')
 
+@app.route('/api/get-generate-meme')
+def get_api_generate_meme():
+    """Get random meme from session 
+    using predefined images in API Meme Generator."""
+    meme = session['meme']
+
+    url = "https://ronreiter-meme-generator.p.rapidapi.com/meme"
+
+    querystring = {"top":".",
+                    "bottom":".",
+                    "meme":f"{meme}",
+                    "font_size":"1",
+                    "font":"Impact"
+                    }
+
+    headers = {
+	    "X-RapidAPI-Key": "4107f9a719msh7b803084f28bdd6p10d9b2jsn4c84f0422879",
+	    "X-RapidAPI-Host": "ronreiter-meme-generator.p.rapidapi.com"
+    }
+    
+    try:
+        response = requests.request("GET", url, headers=headers, params=querystring)
+
+        image = Images.query.filter_by(phrase=meme).first()
+        image.image_data = response.content
+        db.session.commit()
+        
+    except requests.exceptions.HTTPError as http_err:
+        print(f'HTTP error occured: {http_err}')
+    except requests.exceptions.RequestException as req_err:
+        print(f'Request error occured: {req_err}')
+    except Exception as e:
+        print(f'An error occurred:{e}')
+
+    return (response.content, 200, {'Content-Type': 'application/octet-stream'})
+
 ##*************************************************************************************************##
+##SEED DB ROUTES USING EXTERNAL API##
 
 @app.route('/api/post-meme-names-seed-db', methods=["POST"])
 def post_meme_names_seed_iconicle_db():
@@ -173,37 +237,5 @@ def post_meme_names_seed_iconicle_db():
 
     response = random.choice(random_images)
     session['meme'] = response
+
     return response
-
-@app.route('/api/get-generate-meme')
-def get_api_generate_meme():
-    """Get random meme from session 
-    using predefined images in API Meme Generator."""
-    meme = session['meme']
-
-    url = "https://ronreiter-meme-generator.p.rapidapi.com/meme"
-
-    querystring = {"top":".",
-                    "bottom":".",
-                    "meme":f"{meme}",
-                    "font_size":"1",
-                    "font":"Impact"
-                    }
-
-    headers = {
-	    "X-RapidAPI-Key": "4107f9a719msh7b803084f28bdd6p10d9b2jsn4c84f0422879",
-	    "X-RapidAPI-Host": "ronreiter-meme-generator.p.rapidapi.com"
-    }
-    
-    try:
-        response = requests.request("GET", url, headers=headers, params=querystring)
-        
-    except requests.exceptions.HTTPError as http_err:
-        print(f'HTTP error occured: {http_err}')
-    except requests.exceptions.RequestException as req_err:
-        print(f'Request error occured: {req_err}')
-    except Exception as e:
-        print(f'An error occurred:{e}')
-
-    return response.content, 200, {'Content-Type': 'application/octet-stream'}
-

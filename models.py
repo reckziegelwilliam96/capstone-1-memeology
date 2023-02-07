@@ -1,9 +1,9 @@
 """Models for Iconicle app."""
 
-from re import M
 from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import bcrypt
+from flask_bcrypt import Bcrypt
 
+bcrypt = Bcrypt()
 db = SQLAlchemy()
 
 class User(db.Model):
