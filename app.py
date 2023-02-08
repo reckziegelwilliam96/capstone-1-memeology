@@ -7,12 +7,16 @@ from werkzeug.utils import secure_filename
 
 from forms import UserAddForm, LoginForm
 from models import db, connect_db, User, Images, ImageWords
+from iconicle import Iconicle
 
 import requests, random
 
+app = Flask(__name__)
+
+iconicle_game = Iconicle()
+
 CURR_USER_KEY = "curr_user"
 
-app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///iconicle-app'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -114,7 +118,26 @@ def logout():
 @app.route('/')
 def homepage():
     """Show home page."""
-    return render_template('home.html')
+
+    if not g.user:
+        return render_template('home-anon.html')
+
+    return render_template("home.html")
+
+@app.route('/start-game')
+def gamepage():
+    """Show game page."""
+
+    if not g.user:
+        return render_template('home-anon.html')
+
+    board = iconicle_game.make_board()
+
+    session["board"] = board
+    session["round"] = 0
+
+    return render_template("game.html", board=board, round=0)
+
 
 ##*************************************************************************************************##
 ##GAMEPLAY ROUTES##

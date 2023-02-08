@@ -1,4 +1,4 @@
-//API Meme Generator requests: External API to Flask Backend App.py
+//API Meme Generator requests: External API to Flask Backend app.py
 $(document).ready(function(){
     getAPIImageList();
 })
