@@ -14,7 +14,7 @@ class Iconicle():
 
 
     def open_image(self):
-        image_files = [f for f in os.listdir(self.image_dir) if f.endswith(".jpeg")]
+        image_files = [f for f in os.listdir(self.image_dir) if f.endswith(".png")]
         if image_files:
             return os.path.join(self.image_dir, image_files[0])
         else:
@@ -22,7 +22,7 @@ class Iconicle():
     
     def get_filename(self):
         """Get Image Name from image directory."""
-        image_files = [f for f in os.listdir(self.image_dir) if f.endswith(".jpeg")]
+        image_files = [f for f in os.listdir(self.image_dir) if f.endswith(".png")]
         if image_files:
             return image_files[0]
 
@@ -42,7 +42,7 @@ class Iconicle():
                 lower = upper + tile_size[1]
 
                 tile = img.crop((left, upper, right, lower))
-                tile.save(os.path.join(self.tile_dir, "tile_{}_{}.jpg".format(row, col)))
+                tile.save(os.path.join(self.tile_dir, "tile_{}_{}.png".format(row, col)))
     
     def make_board(self):
         """Append board to game, only displaying board """

@@ -13,7 +13,7 @@ import requests, random
 
 app = Flask(__name__)
 
-iconicle_game = Iconicle()
+
 
 CURR_USER_KEY = "curr_user"
 
@@ -26,6 +26,7 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = 'iconicle-key'
 debug = DebugToolbarExtension(app)
 
+iconicle_game = Iconicle()
 
 connect_db(app)
 db.create_all()
