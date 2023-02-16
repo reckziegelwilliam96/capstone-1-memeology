@@ -1,18 +1,16 @@
 from flask import Flask, g, render_template, request, session, flash, redirect, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
-import os
+import os, base64
 
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 from forms import UserAddForm, LoginForm
-from models import db, connect_db, User, Images, ImageWords
-from iconicle import Iconicle
+from models import GuessedImages, db, connect_db, User, Images, ImageWords
 
 import requests, random
 
 app = Flask(__name__)
-
 
 
 CURR_USER_KEY = "curr_user"
@@ -25,8 +23,6 @@ app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = 'iconicle-key'
 debug = DebugToolbarExtension(app)
-
-iconicle_game = Iconicle()
 
 connect_db(app)
 db.create_all()
@@ -115,151 +111,105 @@ def logout():
     return render_template("users/signup.html", form=form)
 
 ##*************************************************************************************************##
-##DISPLAY ROUTES##
+##REQUEST ROUTES##
 @app.route('/')
-def homepage():
-    """Show home page."""
+def index():
+    """Show index page."""
 
     if not g.user:
         return render_template('home-anon.html')
 
-    return render_template("home.html")
 
-@app.route('/start-game')
-def gamepage():
-    """Show game page."""
+    return render_template('index.html')
 
-    if not g.user:
-        return render_template('home-anon.html')
-
-    board = iconicle_game.make_board()
-
-    session["board"] = board
-    session["round"] = 0
-
-    return render_template("game.html", board=board, round=0)
-
-
-##*************************************************************************************************##
-##GAMEPLAY ROUTES##
-
-@app.route("/save-meme", methods=["POST"])
-def save_meme():
+@app.route('/home')
+def display_home():
     
-    if "meme" in request.files:
-        file = request.files["meme"]
-        if file:
-            meme = session["meme"]
-            print(meme)
-            filename = f"{meme}_{secure_filename(file.filename)}"
-            file.save(os.path.join("images", filename))
-            response = jsonify({"message": "Meme saved successfully"})
-            response.status_code = 200
-            return response
-        else:
-            response = jsonify({"error": "File not found in the request"})
-            response.status_code = 400
-            return response
-    else:
-        response = jsonify({"error": "Meme field not found in the request"})
-        response.status_code = 400
-        return response
+    if not g.user:
+        return render_template("home-anon.html")
+
+    user = g.user
+    game_meme = GuessedImages.query.filter_by(user_id=user.id, round=0).first()
+    src = game_meme.database_images.image_data
+
+
+
+    return render_template("home.html", src=src)
+
 
 
 ##*************************************************************************************************##
-##EXTERN API: RAPID API'S MEME GENERATOR ROUTES##
+##EXTERNAL API##
 
-@app.route('/api/get-images-list')
-def get_api_list_images():
+@app.route('/api/get-memes', methods=['GET'])
+def get_memes():
     """Get API list from Meme Generator API and send response to parseList function in JS"""
+    print("GET_MEMES CALLED!")
+    url = "https://api.imgflip.com/get_memes"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return jsonify(data)
+    else:
+        return "Internal Server Error", 500
 
-    url = "https://ronreiter-meme-generator.p.rapidapi.com/images"
 
-    headers = {
-    	"X-RapidAPI-Key": "4107f9a719msh7b803084f28bdd6p10d9b2jsn4c84f0422879",
-    	"X-RapidAPI-Host": "ronreiter-meme-generator.p.rapidapi.com"
-    }
-    
-    try:
-        response = requests.request("GET", url, headers=headers)
-        response.raise_for_status()
-
-        return response.text
-
-    except requests.exceptions.HTTPError as http_err:
-        print(f'HTTP error occured: {http_err}')
-    except requests.exceptions.RequestException as req_err:
-        print(f'Request error occured: {req_err}')
-    except Exception as e:
-        print(f'An error occurred:{e}')
-
-@app.route('/api/get-generate-meme')
-def get_api_generate_meme():
-    """Get random meme from session 
-    using predefined images in API Meme Generator."""
-    meme = session['meme']
-
-    url = "https://ronreiter-meme-generator.p.rapidapi.com/meme"
-
-    querystring = {"top":".",
-                    "bottom":".",
-                    "meme":f"{meme}",
-                    "font_size":"1",
-                    "font":"Impact"
-                    }
-
-    headers = {
-	    "X-RapidAPI-Key": "4107f9a719msh7b803084f28bdd6p10d9b2jsn4c84f0422879",
-	    "X-RapidAPI-Host": "ronreiter-meme-generator.p.rapidapi.com"
-    }
-    
-    try:
-        response = requests.request("GET", url, headers=headers, params=querystring)
-
-        image = Images.query.filter_by(phrase=meme).first()
-        image.image_data = response.content
-        db.session.commit()
-        
-    except requests.exceptions.HTTPError as http_err:
-        print(f'HTTP error occured: {http_err}')
-    except requests.exceptions.RequestException as req_err:
-        print(f'Request error occured: {req_err}')
-    except Exception as e:
-        print(f'An error occurred:{e}')
-
-    return (response.content, 200, {'Content-Type': 'application/octet-stream'})
 
 ##*************************************************************************************************##
-##SEED DB ROUTES USING EXTERNAL API##
+## DB ROUTES##
 
-@app.route('/api/post-meme-names-seed-db', methods=["POST"])
-def post_meme_names_seed_iconicle_db():
-    """Seed database with post request from JS file, 
-    parse random_images phrases into Meme class, 
-    parse again into MemeWords class """
-    
+@app.route('/api/save-memes-to-db', methods=['POST'])
+def save_memes_to_db():
+    print("SAVE_MEMES CALLED!")
+    data = request.get_json()
+    memes = data['memes']
+    user = g.user
 
-    try:
-        random_images = request.get_json()
-        
-        for image_phrase in random_images:
-            created_image = Images(phrase=image_phrase)
-            db.session.add(created_image)
+    for meme in memes:
+        new_image = Images(phrase=meme['name'], image_data=meme['url'])
+        print(new_image.image_data)
+        db.session.add(new_image)
+        db.session.commit()
+        for word in meme['name'].lower().replace("'", "").split():
+            new_word = ImageWords(word=word, image_id=new_image.id)
+            db.session.add(new_word)
             db.session.commit()
+    
+    game_image = GuessedImages(
+                image_id=new_image.id,
+                user_id=user.id,
+                round=0
+                )
+    db.session.add(game_image)
+    db.session.commit()
 
-            words = image_phrase.split("-")
-            for word in words:
-                print(f"created_image type:{type(created_image)}")
-                image_word = ImageWords(word=word, image_id=created_image.id)
-                db.session.add(image_word)
-                db.session.commit()
-    except Exception as e:
-        print(f"Error processing data: {e}")
-        db.session.rollback()
-        return "Error processing data", 500
+    return 'Memes saved to database'
 
 
-    response = random.choice(random_images)
-    session['meme'] = response
+@app.route('/compare-word-to-db')
+def compare_word_to_db():
+    print("COMPARE_WORDS CALLED!")
+    user = g.user
 
-    return response
+    keyword = request.args['keyword']
+
+    game_meme = GuessedImages.query.filter_by(user_id=user.id).first()
+
+    if game_meme is None:
+        return 'No game meme found in session'
+
+    
+    image = game_meme.database_images
+    if image is None:
+        return 'No image found for game meme'
+
+    words = {word.word.lower() for word in image.image_words}
+    if keyword.lower() in words:
+        return jsonify({'result': 'correct', 'message': 'Correct keyword!'})
+    else:
+        # Update the game round and save the updated object
+        game_meme.round += 1
+        db.session.add(game_meme)
+        db.session.commit()
+        # Return the updated game_meme object in the JSON response
+        return jsonify({'result': 'not-correct', 'message': 'Incorrect keyword.'})

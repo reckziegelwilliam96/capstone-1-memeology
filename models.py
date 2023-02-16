@@ -68,7 +68,7 @@ class Images(db.Model):
     phrase = db.Column(db.Text,
                     nullable=False)
     
-    image_data = db.Column(db.LargeBinary,
+    image_data = db.Column(db.Text,
                     nullable=True)
     
     image_words = db.relationship('ImageWords', backref='images')
@@ -112,10 +112,12 @@ class GuessedImages(db.Model):
     user_id = db.Column(db.Integer,
                         db.ForeignKey("users.id"))
     
-    status = db.Column(db.Integer,
+    round = db.Column(db.Integer,
                         nullable=True)
 
     guessed_by = db.relationship('User', backref='users')
+
+    
 
 class InProgessImages(db.Model):
     """Incoplete User Guesses class."""

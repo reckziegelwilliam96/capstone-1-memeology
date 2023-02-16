@@ -24,14 +24,63 @@ nav + .container {
 img {
     display: block;
     margin: 0 auto;
+    width: 200px;
+    height: 200px;
 }
-/* ====================== GameBoard */
 
-#record .guess {
-    width: 50px;
-    height: 50px;
-    background: #fff;
-    text-align: center;
-    line-height: 50px;
-    float: left;
+/* ====================== Alerts */
+.msg.ok {
+    color: white;
+    background-color: green;
 }
+
+.msg.err {
+    color: white;
+    background-color: tomato;
+}
+
+/* ====================== Game Image */
+#image-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    width: 400px;
+    height: 400px;
+    position: relative;
+  }
+
+#image-container::before {
+  content: "";
+  background: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 1;
+}
+
+.tile {
+    background: #fff;
+    border: 1px solid #000;
+    box-sizing: border-box;
+    width: calc(100% / 4);
+    height: calc(100% / 4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .visible {
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+  }
+  
+  .hidden {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+  
+  
+  
+  
+  

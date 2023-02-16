@@ -5,11 +5,24 @@
 {% block content %}
 
 <h1>Iconicle</h1>
-
-<div class="container">
-    <form action="/start-game">
-        <button class="btn-primary" id="start-game">Start Game</button>
+<section id="memeo">
+    <form methods="POST" class="add-keyword">
+        <input type="text" class="keyword" name="keyword" placeholder="Enter your keyword">
+        <button>Enter</button>
     </form>
-</div>
-
+    <h4>Round</h4>
+    <p class="round">0</p>
+    <h4>Result</h4>
+    <p class="msg"></p>
+    <div class="image-container">
+        <img src="{{ src }}">
+    </div>
+    <form action="/" method="GET" class="restart-btn">
+        <button>Restart Game</button>
+    </form>
+</section>
+    <script src="/static/game.js"></script>
+    <script>
+        let game = new MemeoGame("memeo")
+    </script>
 {% endblock %}
