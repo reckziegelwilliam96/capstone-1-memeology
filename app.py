@@ -149,7 +149,10 @@ def display_home():
     
     return render_template("home.html", src=src)
 
+@app.route('/instructions')
+def display_instructions():
 
+    return render_template("instructions.html")
 
 ##*************************************************************************************************##
 ##EXTERNAL API##
@@ -187,6 +190,8 @@ def save_memes_to_db():
             new_word = ImageWords(word=word, image_id=new_image.id)
             db.session.add(new_word)
             db.session.commit()
+    
+
     
     game_image = GuessedImages(
                 image_id=new_image.id,

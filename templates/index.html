@@ -4,10 +4,13 @@
 
 {% block content %}
 
-<h1>Iconicle</h1>
-<form action="/home">
-    <button class="start-btn">Start Game</button>
-</form>
+<div class="container mt-5 text-center">
+    <div class="d-grid gap-2">
+      <form action="/home">
+        <button class="start-btn btn btn-primary">Start Game</button>
+      </form>
+    </div>
+</div>
 <script src="/static/memes.js"></script>
 
 {% endblock %}

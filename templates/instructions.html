@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %} Memeo Instructions {% endblock %}
+
+{% block content %}
+<div class="container-parent">
+  <div class="container mt-5 container-instructions">
+    <div class="instruction-header">
+      <h3>How To Play</h3>
+    </div>
+    <ul class="instruction-list">
+      <li>
+        <img src="/static/images/memeo-bullet.png" alt="Memeo logo">
+        <span class="fw-bold">Goal:</span> Guess the hidden meme in as few rounds as possible.
+      </li>
+      <li>
+        <img src="/static/images/memeo-bullet.png" alt="Memeo logo">
+        You will have 6 attempts to guess the meme.
+      </li>
+      <li>
+        <img src="/static/images/memeo-bullet.png" alt="Memeo logo">
+        New tiles are revealed with every incorrect guess.
+      </li>
+      <li>
+        <img src="/static/images/memeo-bullet.png" alt="Memeo logo">
+        Submit your answers in the search bar.
+      </li>
+    </ul>
+    <div class="text-center">
+      <h3>Good luck!</h3>
+    </div>
+  </div>
+</div>
+  
+  
+  
+
+{% endblock %} 

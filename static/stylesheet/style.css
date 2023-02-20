@@ -1,4 +1,43 @@
-.container {
+/* ====================== Buttons */
+
+.btn-primary {
+    background-color: rgb(85, 225, 183);
+    border-color: rgb(85, 225, 183);
+}
+
+.btn-primary:hover {
+    background-color: rgb(68, 180, 146);
+    border-color: rgb(68, 180, 146);
+}
+
+.start-btn {
+    background-color: rgb(85, 225, 183);
+    border-color: rgb(85, 225, 183);
+    font-size: 1.5rem;
+    padding: 10px 50px;
+    display: block;
+    margin: 0 auto;
+  }
+
+button {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    font-size: 1.2rem;
+    background-color: rgb(85, 225, 183);
+    color: #fff;
+}
+
+button:hover {
+    background-color: rgb(68, 180, 146);
+}
+  
+
+/* ====================== Navbar */
+
+/* .container {
     margin: 1rem;
     width: 100%;
     display: block;
@@ -6,33 +45,156 @@
     align-items: center;
     margin-right: auto;
     margin-left: auto;
-    position: absolute;
+} */
+
+.navbar {
+    background-color: rgb(85, 225, 183);
+    height: 70px; /* adjust height as needed */
+  }
+  
+.navbar-brand {
+  display: inline-block;
+  margin-top: 5px; /* adjust margin as needed */
 }
 
-nav + .container {
-    margin-bottom: 1rem;
-    position: absolute;
+.navbar-brand img {
+  height: 30px;
+  width: 30px; /* adjust height as needed */
+  margin-right: 10px; /* adjust margin as needed */
+}
+
+.navbar-nav {
+  margin-left: auto;
+}
+
+.navbar-nav li {
+  margin: 0 10px; /* adjust margin as needed */
+}
+
+.navbar-nav li a + a {
+  color: white;
+}
+
+.navbar-nav li a:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Position the Memeo icon in the upper right corner */
+.navbar-header {
+  position: relative;
+}
+
+.navbar-header .memeo-icon {
+  position: absolute;
+  top: 5px; /* adjust top as needed */
+  right: 10px; /* adjust right as needed */
+  height: 25px; /* adjust height as needed */
+  width: auto;
+}
+
+/* ====================== Instructions */
+
+.container-parent {
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
   }
 
+.container-instructions {
+    background-color: rgb(85, 225, 183);
+    display: center;
+    padding: 40px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+.instruction-header {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 0 0 5px 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.instruction-header h3 {
+    font-weight: bold;
+    margin: 0;
+    font-size: 28px;
+}
+
+.instruction-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.instruction-list li {
+    margin-bottom: 20px;
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+.instruction-list li img {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+    margin-bottom: 3px;
+    width: 18px;
+    height: 18px;
+}
 /* ====================== Form */
 .game-container {
-    width: 100%;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 700px;
+    margin: 0 auto;
+    margin-top: 50px;
+    background-color: #fff;
+    padding: 40px;
     flex-direction: column;
   }
   
 .form-container {
     margin-top: 2rem;
-    justify-content: left;
-    align-items: left;
-    position: relative;
+    justify-content: center;
+    align-items: center;
+    position: relative;   
+}
+
+.add-keyword {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: darkgray;
+}
+
+.keyword {
+    height: 40px;
+    padding: 0 10px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    margin-right: 10px;
+    font-size: 1.2rem;
 }
 
 .results-container {
+    padding: 5%;
     margin-top: 2rem;
-    justify-content: left;
-    align-items: left;
+    margin-bottom: 2rem;
+    justify-content: center;
+    align-items: center;
 }
+
+.restart-container {
+    width: 100%;
+    padding: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ====================== Round Display */
 
 .letter {
     font-size: 50px;
@@ -80,21 +242,22 @@ img {
 }
 
 .image-wrapper {
-    width: 100%;
-    height: 100%;
-    padding-bottom: 30%;
+    width: 400px;
+    height: 400px;
+    justify-content: center;
+    align-items: center;
     position: relative;
     overflow: visible;
   }
 
 .image-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 400px;
-  height: 400px;
-  position: relative;
-  z-index: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 0;
 }
 
 .tiles-container {

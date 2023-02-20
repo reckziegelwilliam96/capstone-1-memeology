@@ -102,10 +102,13 @@ class MemeoGame{
             this.addTiles(this.round);
             this.showMessage(message, result, this.round);
             this.addImage(this.imageSrc);
+        } else if (result === "game-over") {
+            this.showRound(this.round, result);
+            this.showMessage(message, result, this.round);
+        } else {
+            this.showRound(this.round, result);
+            this.showMessage(message, result, this.round);
         }
-        this.showRound(this.round, result);
-        this.showMessage(message, result, this.round);
-        
     };
 
 }
