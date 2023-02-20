@@ -1,28 +1,45 @@
 {% extends 'base.html' %}
 
-{% block title %} Iconicle {% endblock %}
+{% block title %} Memeology {% endblock %}
 
 {% block content %}
 
-<h1>Iconicle</h1>
+<h1>Memeology</h1>
+
 <section id="memeo">
-    <form methods="POST" class="add-keyword">
-        <input type="text" class="keyword" name="keyword" placeholder="Enter your keyword">
-        <button>Enter</button>
-    </form>
-    <h4>Round</h4>
-    <p class="round">0</p>
-    <h4>Result</h4>
-    <p class="msg"></p>
-    <div class="image-container">
-        <img src="{{ src }}">
+    <div class="game-container">
+        <div class="form-container">
+            <form methods="POST" class="add-keyword">
+                <input type="text" class="keyword" name="keyword" placeholder="Enter your keyword">
+                <button>Enter</button>
+            </form>
+        </div>
+        <div class="results-container">
+            <div class="round">
+                <span class="letter">M</span>
+                <span class="letter">E</span>
+                <span class="letter">M</span>
+                <span class="letter">E</span>
+                <span class="letter2">O</span>
+              </div>
+            <h4>Result</h4>
+            <p class="msg"></p>
+        </div>
+        <div class="image-wrapper">
+            <div class="image-container"></div>
+            <div class="tiles-container"></div>
+        </div>
+    
+        <div class="restart-container">
+            <form action="/" method="GET" class="restart-btn">
+                <button>Restart Game</button>
+            </form>
+        </div>
     </div>
-    <form action="/" method="GET" class="restart-btn">
-        <button>Restart Game</button>
-    </form>
 </section>
+
     <script src="/static/game.js"></script>
     <script>
-        let game = new MemeoGame("memeo")
+        let game = new MemeoGame("memeo", "{{ src }}");
     </script>
 {% endblock %}

@@ -1,6 +1,6 @@
 from app import app
 
-from models import Images, ImageWords, GuessedImages, InProgessImages, GeneratedMemes, db
+from models import Images, ImageWords, GuessedImages, InProgressImages, GeneratedMemes, db
 
 db.drop_all()
 db.create_all()

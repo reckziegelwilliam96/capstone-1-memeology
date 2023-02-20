@@ -118,6 +118,21 @@ def index():
 
     if not g.user:
         return render_template('home-anon.html')
+    
+    user = g.user
+
+    guessed_image = GuessedImages.query.filter_by(user_id=user.id).first()
+    if guessed_image:
+        in_progress_image = guessed_image.in_progress
+        if in_progress_image:
+            in_progress_image.in_round = True
+            db.session.add(in_progress_image)
+            db.session.commit()
+            print(in_progress_image)
+        else:
+            print("No `InProgressImages` instance found for the selected `GuessedImages` instance")
+    else:
+        print("No `GuessedImages` instance found with the specified ID")
 
 
     return render_template('index.html')
@@ -129,11 +144,9 @@ def display_home():
         return render_template("home-anon.html")
 
     user = g.user
-    game_meme = GuessedImages.query.filter_by(user_id=user.id, round=0).first()
+    game_meme = GuessedImages.query.filter_by(user_id=user.id).first()
     src = game_meme.database_images.image_data
-
-
-
+    
     return render_template("home.html", src=src)
 
 
@@ -180,6 +193,7 @@ def save_memes_to_db():
                 user_id=user.id,
                 round=0
                 )
+    print(game_image)
     db.session.add(game_image)
     db.session.commit()
 
@@ -193,7 +207,8 @@ def compare_word_to_db():
 
     keyword = request.args['keyword']
 
-    game_meme = GuessedImages.query.filter_by(user_id=user.id).first()
+    game_meme = GuessedImages.query.filter_by(id=user.id).first()
+    print(game_meme.round)
 
     if game_meme is None:
         return 'No game meme found in session'
@@ -205,11 +220,15 @@ def compare_word_to_db():
 
     words = {word.word.lower() for word in image.image_words}
     if keyword.lower() in words:
-        return jsonify({'result': 'correct', 'message': 'Correct keyword!'})
+        return jsonify({'result': 'correct', 'message': 'You are a Lord over Lords.'})
     else:
         # Update the game round and save the updated object
-        game_meme.round += 1
-        db.session.add(game_meme)
-        db.session.commit()
-        # Return the updated game_meme object in the JSON response
-        return jsonify({'result': 'not-correct', 'message': 'Incorrect keyword.'})
+        if game_meme.round >= 6:
+            return jsonify({'result': 'game-over', 'message': "You've run out of guesses."})
+        else:
+            game_meme.round += 1
+            print(game_meme.round)
+            db.session.commit()
+            # Return the updated game_meme object in the JSON response
+            return jsonify({'result': 'not-correct', 'message': 'Better luck next time.'})
+

@@ -21,7 +21,7 @@ const handleList = (data) => {
   const memes = data.data.memes;
   const randomMemes = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 100; i++) {
     const randomIndex = Math.floor(Math.random() * memes.length);
     randomMemes.push({ name: memes[randomIndex].name, url: memes[randomIndex].url });
     memes.splice(randomIndex, 1); // remove the selected meme from the array

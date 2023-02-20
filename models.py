@@ -71,13 +71,11 @@ class Images(db.Model):
     image_data = db.Column(db.Text,
                     nullable=True)
     
-    image_words = db.relationship('ImageWords', backref='images')
+    image_words = db.relationship('ImageWords', backref='database_images')
 
     guessed_images = db.relationship('GuessedImages', backref='database_images')
 
     generated_memes = db.relationship('GeneratedMemes', backref='database_images')
-
-    in_progress_images = db.relationship('InProgessImages', backref='database_images') 
 
 
 class ImageWords(db.Model):
@@ -117,12 +115,15 @@ class GuessedImages(db.Model):
 
     guessed_by = db.relationship('User', backref='users')
 
-    
+    in_progress = db.relationship('InProgressImages', secondary='database_images', backref='guessed_images')
 
-class InProgessImages(db.Model):
+
+
+
+class InProgressImages(db.Model):
     """Incoplete User Guesses class."""
 
-    __tablename__ = "in_progess_images"
+    __tablename__ = "in_progress_images"
 
     id = db.Column(db.Integer,
                     primary_key=True,
@@ -134,6 +135,9 @@ class InProgessImages(db.Model):
     
     user_id = db.Column(db.Integer,
                         db.ForeignKey("users.id"))
+
+    in_round = db.Column(db.Boolean, 
+                        nullable=True)
     
 
 class GeneratedMemes(db.Model):
