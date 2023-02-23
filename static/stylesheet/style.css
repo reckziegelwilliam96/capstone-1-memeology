@@ -19,6 +19,26 @@
     margin: 0 auto;
   }
 
+.restart-btn {
+  background-color: rgb(251,164,92);
+  border-color: rgb(251,164,92);
+  font-size: 1.5rem;
+  padding: 10px 50px;
+  display: block;
+  margin: 0 auto;
+}
+
+button {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    font-size: 1.2rem;
+    background-color: rgb(85, 225, 183);
+    color: #fff;
+}
+
 button {
     height: 40px;
     padding: 0 20px;
@@ -107,7 +127,19 @@ button:hover {
     max-width: 700px;
     margin: 0 auto;
   }
-  
+
+.container-gameover {
+  background-color: rgb(251,164,92);
+  display: center;
+  padding: 40px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.gameover-header {
+    text-align: center;
+}
+
 .instruction-header {
     background-color: #fff;
     padding: 20px;
@@ -189,7 +221,7 @@ button:hover {
 .restart-container {
     width: 100%;
     padding: 10%;
-    display: flex;
+    display: block;
     justify-content: center;
     align-items: center;
 }

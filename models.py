@@ -1,4 +1,4 @@
-"""Models for Iconicle app."""
+"""Models for Memeo app."""
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -112,12 +112,13 @@ class GuessedImages(db.Model):
     
     round = db.Column(db.Integer,
                         nullable=True)
+    
+    completed = db.Column(db.Boolean,
+                        nullable=True)
 
     guessed_by = db.relationship('User', backref='users')
 
     in_progress = db.relationship('InProgressImages', secondary='database_images', backref='guessed_images')
-
-
 
 
 class InProgressImages(db.Model):

@@ -1,8 +1,4 @@
-$(".start-btn").ready(function(){
-    getMemes();
-})
-
-$(".restart-btn").ready(function(){
+$("#load-btn").ready(function(){
     getMemes();
 })
 
@@ -27,7 +23,7 @@ const handleList = (data) => {
     memes.splice(randomIndex, 1); // remove the selected meme from the array
   }
 
-  axios.post('/api/save-memes-to-db', { memes: randomMemes })
+  axios.post('/api/save-memes', { memes: randomMemes })
     .then(response => console.log(response.data))
     .catch(error => console.log(error));
 

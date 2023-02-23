@@ -3,11 +3,16 @@
 {% block title %} Memeo {% endblock %}
 
 {% block content %}
-
+<div class="container mt-5 text-center">
+    <img src="/static/images/memeo-logo.png">
+</div>
+<div class="text-center">
+    <h3>Find Out What We Meme</h3>
+  </div>
 <div class="container mt-5 text-center">
     <div class="d-grid gap-2">
-      <form action="/home">
-        <button class="start-btn btn btn-primary">Start Game</button>
+      <form action="/instructions">
+        <button id="load-btn" class="btn btn-primary">Instructions</button>
       </form>
     </div>
 </div>

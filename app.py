@@ -3,10 +3,11 @@ from flask_debugtoolbar import DebugToolbarExtension
 import os, base64
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from werkzeug.utils import secure_filename
 
 from forms import UserAddForm, LoginForm
-from models import GuessedImages, db, connect_db, User, Images, ImageWords
+from models import GuessedImages, InProgressImages, db, connect_db, User, Images, ImageWords
 
 import requests, random
 
@@ -16,12 +17,12 @@ app = Flask(__name__)
 CURR_USER_KEY = "curr_user"
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///iconicle-app'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///memeo-app'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-app.config['SECRET_KEY'] = 'iconicle-key'
+app.config['SECRET_KEY'] = 'memeo-key'
 debug = DebugToolbarExtension(app)
 
 connect_db(app)
@@ -67,7 +68,7 @@ def sign_up():
 
         except IntegrityError:
             flash('Username taken', 'danger')
-            return render_template('users/signup.html', form-form)
+            return render_template('users/signup.html', form=form)
         
         do_login(user)
 
@@ -117,42 +118,42 @@ def index():
     """Show index page."""
 
     if not g.user:
-        return render_template('home-anon.html')
+        return redirect('/login')
     
-    user = g.user
-
-    guessed_image = GuessedImages.query.filter_by(user_id=user.id).first()
-    if guessed_image:
-        in_progress_image = guessed_image.in_progress
-        if in_progress_image:
-            in_progress_image.in_round = True
-            db.session.add(in_progress_image)
-            db.session.commit()
-            print(in_progress_image)
-        else:
-            print("No `InProgressImages` instance found for the selected `GuessedImages` instance")
-    else:
-        print("No `GuessedImages` instance found with the specified ID")
-
-
+    round = session["round"]
+    if round >= 6:
+        return redirect('/select-game-meme')
+    
     return render_template('index.html')
 
 @app.route('/home')
-def display_home():
+def render_home_page():
     
     if not g.user:
-        return render_template("home-anon.html")
+        return redirect('/login')
 
-    user = g.user
-    game_meme = GuessedImages.query.filter_by(user_id=user.id).first()
-    src = game_meme.database_images.image_data
+    round = session["round"]
+    round_meme = session["round_meme"]
+    
+    guess_image_id = session["guess_image"]
+    guess_image = GuessedImages.query.filter_by(id=guess_image_id).first()
+
+    if round_meme is None or round >= 6 or guess_image.completed == True:
+        return redirect('/select-game-meme')
+
+    src = session["src"]
     
     return render_template("home.html", src=src)
 
 @app.route('/instructions')
-def display_instructions():
+def render_instructions_page():
 
     return render_template("instructions.html")
+
+@app.route('/game-over')
+def render_game_over_page():
+
+    return render_template("gameover.html")
 
 ##*************************************************************************************************##
 ##EXTERNAL API##
@@ -170,69 +171,115 @@ def get_memes():
         return "Internal Server Error", 500
 
 
-
-##*************************************************************************************************##
-## DB ROUTES##
-
-@app.route('/api/save-memes-to-db', methods=['POST'])
+@app.route('/api/save-memes', methods=['POST'])
 def save_memes_to_db():
+    """API call to save all memes into database."""
     print("SAVE_MEMES CALLED!")
     data = request.get_json()
     memes = data['memes']
-    user = g.user
+    
 
     for meme in memes:
         new_image = Images(phrase=meme['name'], image_data=meme['url'])
-        print(new_image.image_data)
         db.session.add(new_image)
         db.session.commit()
         for word in meme['name'].lower().replace("'", "").split():
             new_word = ImageWords(word=word, image_id=new_image.id)
             db.session.add(new_word)
             db.session.commit()
-    
-
-    
-    game_image = GuessedImages(
-                image_id=new_image.id,
-                user_id=user.id,
-                round=0
-                )
-    print(game_image)
-    db.session.add(game_image)
-    db.session.commit()
 
     return 'Memes saved to database'
 
+##*************************************************************************************************##
+## DB ROUTES##
 
-@app.route('/compare-word-to-db')
-def compare_word_to_db():
-    print("COMPARE_WORDS CALLED!")
+### STILL NEEDS TO BE ADDED - GET METHOD?
+@app.route('/select-game-meme')    
+def select_meme_for_game():
+    print("SELECT_GAME_MEME CALLED")
+
+    if not g.user:
+        return redirect('/login')
+
     user = g.user
+    # SELECT RANDOM IMAGE FROM DATABASE
+    current_image = Images.query.order_by(func.random()).first()
 
+    # INSTANTIATE IMAGE FOR ROUND 
+    round_meme = InProgressImages(
+                image_id = current_image.id,
+                user_id = user.id,
+                in_round = True
+                )
+    guess_image = GuessedImages(
+                image_id = current_image.id,
+                user_id = user.id,
+                round = 0,
+                completed = False
+                )
+
+    db.session.add(round_meme)
+    db.session.add(guess_image)
+    db.session.commit()
+
+    print(guess_image.round)
+
+    # SAVE TO SESSION FOR REFERENCE ON INDEX
+    session["round_meme"] = round_meme.id
+    session["round"] = 0
+
+    session["guess_image"] = guess_image.id
+    session["src"] = guess_image.database_images.image_data
+
+    print(session["round_meme"])
+    return redirect('/home')
+    
+
+@app.route('/update-game-meme')
+def update_guessed_image():
+    print("UPDATE_GUESSED_IMAGE CALLED!")
+
+    # ROUND NEEDS TO BE REFERENCED -  UPDATE GUESSEDIMAGE ROUND
+    round = session['round']
+    round_meme_id = session["round_meme"]
+    round_meme = InProgressImages.query.filter_by(id=round_meme_id).first()
+    guess_image_id = session["guess_image"]
+    guess_image = GuessedImages.query.filter_by(id=guess_image_id).first()
+
+    update_image = round_meme.guessed_images[0]
+    print(f"BEFORE UPDATE: {update_image.round}")
+
+    if guess_image != update_image:
+        return 'Internal Reference Error: Session and Database'
+
+    # FROM GAME.JS
     keyword = request.args['keyword']
 
-    game_meme = GuessedImages.query.filter_by(id=user.id).first()
-    print(game_meme.round)
-
-    if game_meme is None:
+    if update_image is None or round_meme.in_round == False or update_image.completed == True:
         return 'No game meme found in session'
 
-    
-    image = game_meme.database_images
+    image = update_image.database_images
+
     if image is None:
         return 'No image found for game meme'
 
     words = {word.word.lower() for word in image.image_words}
     if keyword.lower() in words:
         return jsonify({'result': 'correct', 'message': 'You are a Lord over Lords.'})
+
     else:
         # Update the game round and save the updated object
-        if game_meme.round >= 6:
+        if round >= 6:
+            update_image.completed = True
+            db.session.commit()
+            session.clear()
             return jsonify({'result': 'game-over', 'message': "You've run out of guesses."})
+            
         else:
-            game_meme.round += 1
-            print(game_meme.round)
+            round += 1
+            session["round"] = round
+            update_image.round = round
+            print(f"AFTER UPDATE:{update_image.round}")
             db.session.commit()
             # Return the updated game_meme object in the JSON response
             return jsonify({'result': 'not-correct', 'message': 'Better luck next time.'})

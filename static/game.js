@@ -92,7 +92,7 @@ class MemeoGame{
         const keyword = inputField.val();
         inputField.val('');
 
-        const response = await axios.get('/compare-word-to-db', { params: { keyword: keyword }});
+        const response = await axios.get('/update-game-meme', { params: { keyword: keyword }});
         const result = response.data.result;
         const message = response.data.message;
 
@@ -105,9 +105,11 @@ class MemeoGame{
         } else if (result === "game-over") {
             this.showRound(this.round, result);
             this.showMessage(message, result, this.round);
+            window.location.href = '/game-over';
         } else {
             this.showRound(this.round, result);
             this.showMessage(message, result, this.round);
+            window.location.href = '/game-over';
         }
     };
 
