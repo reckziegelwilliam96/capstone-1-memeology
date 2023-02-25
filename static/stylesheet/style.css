@@ -19,13 +19,9 @@
     margin: 0 auto;
   }
 
-.restart-btn {
-  background-color: rgb(251,164,92);
-  border-color: rgb(251,164,92);
-  font-size: 1.5rem;
-  padding: 10px 50px;
-  display: block;
-  margin: 0 auto;
+
+.gameover-img {
+  display: flex;
 }
 
 button {
@@ -69,18 +65,21 @@ button:hover {
 
 .navbar {
     background-color: rgb(85, 225, 183);
-    height: 70px; /* adjust height as needed */
+    height: 70px;
   }
   
 .navbar-brand {
   display: inline-block;
-  margin-top: 5px; /* adjust margin as needed */
+  font-size: small;
+  margin-left: 10px;
 }
 
 .navbar-brand img {
-  height: 30px;
-  width: 30px; /* adjust height as needed */
-  margin-right: 10px; /* adjust margin as needed */
+  height: 45px;
+  width: 45px;
+  margin-top: 10px;
+  margin-right: -20px;
+  margin-bottom: 5px;
 }
 
 .navbar-nav {
@@ -88,7 +87,7 @@ button:hover {
 }
 
 .navbar-nav li {
-  margin: 0 10px; /* adjust margin as needed */
+  margin: 0 10px;
 }
 
 .navbar-nav li a + a {
@@ -106,9 +105,9 @@ button:hover {
 
 .navbar-header .memeo-icon {
   position: absolute;
-  top: 5px; /* adjust top as needed */
-  right: 10px; /* adjust right as needed */
-  height: 25px; /* adjust height as needed */
+  top: 5px;
+  right: 10px;
+  height: 25px;
   width: auto;
 }
 
@@ -169,9 +168,8 @@ button:hover {
     display: inline-block;
     vertical-align: middle;
     margin-right: 10px;
-    margin-bottom: 3px;
-    width: 18px;
-    height: 18px;
+    width: 50px;
+    height: 50px;
 }
 /* ====================== Form */
 .game-container {
@@ -180,14 +178,13 @@ button:hover {
     align-items: center;
     max-width: 700px;
     margin: 0 auto;
-    margin-top: 50px;
     background-color: #fff;
     padding: 40px;
     flex-direction: column;
   }
   
 .form-container {
-    margin-top: 2rem;
+    margin: 2rem;
     justify-content: center;
     align-items: center;
     position: relative;   
@@ -202,6 +199,7 @@ button:hover {
 
 .keyword {
     height: 40px;
+    width: 100%;
     padding: 0 10px;
     border-radius: 5px;
     border: none;
@@ -212,8 +210,8 @@ button:hover {
 
 .results-container {
     padding: 5%;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
     justify-content: center;
     align-items: center;
 }
@@ -226,25 +224,34 @@ button:hover {
     align-items: center;
 }
 
+.form-control {
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.btn-lg {
+  --bs-btn-padding-y: 0rem;
+}
+
 /* ====================== Round Display */
 
 .letter {
     font-size: 50px;
     font-weight: bold;
     margin: 0 5px;
-    transition: color 0.5s;
-}
-  
-.letter.black {
-    color: black;
+    transition: color 1s;
 }
 
 .letter.red {
-    color: red;
+    color: rgb(251,164,92);
+    font-size: 75px;
+    transition: color 4s;
 }
 
 .letter.green {
-    color: green;
+    color: rgb(85, 225, 183);
+    font-size: 75px;
+    transition: color 4s;
 }
 
 
@@ -265,17 +272,21 @@ button:hover {
     height: 100%;
 }
 
+.score-container {
+  padding: 1rem;
+}
+
 img {
     display: flex;
     margin: 0 auto;
-    width: 400px;
-    height: 400px;
+    width: 600px;
+    height: 600px;
     position: relative;
 }
 
 .image-wrapper {
-    width: 400px;
-    height: 400px;
+    width: 600px;
+    height: 600px;
     justify-content: center;
     align-items: center;
     position: relative;
@@ -295,8 +306,8 @@ img {
 .tiles-container {
     display: grid;
     position: absolute;
-    width: 400px;
-    height: 400px;
+    width: 600px;
+    height: 600px;
     border: 1px solid #000;
     top: 0;
     left: 0;

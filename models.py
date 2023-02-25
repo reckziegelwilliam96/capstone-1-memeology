@@ -139,6 +139,19 @@ class InProgressImages(db.Model):
 
     in_round = db.Column(db.Boolean, 
                         nullable=True)
+
+class GameRecord(db.Model):
+    """Record of User Games"""
+    id = db.Column(db.Integer,
+                    primary_key=True,
+                    unique=True,
+                    nullable=False)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.id"))
+    guessed_image_id = db.Column(db.Integer,
+                        db.ForeignKey("guessed_images.id"))
+    round = db.Column(db.Integer,
+                        nullable=False)
     
 
 class GeneratedMemes(db.Model):

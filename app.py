@@ -1,6 +1,5 @@
 from flask import Flask, g, render_template, request, session, flash, redirect, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
-import os, base64
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
@@ -120,11 +119,10 @@ def index():
     if not g.user:
         return redirect('/login')
     
-    round = session["round"]
-    if round >= 6:
+    if not session:
         return redirect('/select-game-meme')
-    
-    return render_template('index.html')
+    else:
+        return render_template('index.html')
 
 @app.route('/home')
 def render_home_page():
@@ -138,7 +136,7 @@ def render_home_page():
     guess_image_id = session["guess_image"]
     guess_image = GuessedImages.query.filter_by(id=guess_image_id).first()
 
-    if round_meme is None or round >= 6 or guess_image.completed == True:
+    if round_meme is None or round >= 5 or guess_image.completed == True:
         return redirect('/select-game-meme')
 
     src = session["src"]
@@ -265,15 +263,25 @@ def update_guessed_image():
 
     words = {word.word.lower() for word in image.image_words}
     if keyword.lower() in words:
-        return jsonify({'result': 'correct', 'message': 'You are a Lord over Lords.'})
+        round += 1
+        session["round"] = round
+        update_image.round = round
+        phrase = update_image.database_images.phrase
+        print(phrase)
+        guess_image.completed = True
+        db.session.commit()
+        session.clear()
+        return jsonify({'result': 'correct', 'message': 'You are a Lord over Lords.', 'phrase': phrase})
 
     else:
         # Update the game round and save the updated object
-        if round >= 6:
+        if round >= 5:
+            phrase = update_image.database_images.phrase
+            print(phrase)
             update_image.completed = True
             db.session.commit()
             session.clear()
-            return jsonify({'result': 'game-over', 'message': "You've run out of guesses."})
+            return jsonify({'result': 'game-over', 'message': "You've run out of guesses.", 'phrase': phrase})
             
         else:
             round += 1
