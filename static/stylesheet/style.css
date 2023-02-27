@@ -245,13 +245,13 @@ button:hover {
 .letter.red {
     color: rgb(251,164,92);
     font-size: 75px;
-    transition: color 4s;
+    transition: color 3s;
 }
 
 .letter.green {
     color: rgb(85, 225, 183);
     font-size: 75px;
-    transition: color 4s;
+    transition: color 3s;
 }
 
 

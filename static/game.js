@@ -33,9 +33,14 @@ class MemeoGame{
             const msg = $('<p>').text(message);
             container.addClass('success');
             container.append(msg);
+            if (phrase !== null && phrase !== ""){ 
+              const phraseMsg = $('<p>').text(`The phrase was: ${phrase}`);
+              container.append(phraseMsg);
+            }
         }
     }
     }
+    
     addImage(src) {
         const container = $(".image-container", this.board);
         const image = $("<img>").attr("src", src);
@@ -43,20 +48,19 @@ class MemeoGame{
         container.append(image);
     }
 
-    showRound(round, result) {
-        const container = $(".score-container");
-        const letters = [$("#letter-1"), $("#letter-2"), $("#letter-3"), $("#letter-4"), $("#letter-5")];
-    
-        for (let i = 0; i < letters.length; i++) {
-            const letter = letters[i];
-            if (i === round - 1) {
-                if (result === "correct") {
-                  letter.addClass("green");
-                } else if (result === "not-correct") {
-                  letter.addClass("red");
-                }
-                container.append(letter);
+    removeTiles(round, result) {
+      const container = $(".tiles-container", this.board);
+        if (round === 5 || result === "correct") {
+          container.empty();
         }
+    }
+
+    showRound(round, result) {
+      const letter = $(`#letter-${round}`);
+      if (result === "correct") {
+        letter.addClass("green");
+      } else if (result === "not-correct") {
+        letter.addClass("red");
       }
     }
 
@@ -111,12 +115,17 @@ class MemeoGame{
             const message = response.data.message;
             const phrase = response.data.phrase;
             this.showRound(this.round, result);
+            this.removeTiles(this.round);
+            this.addImage(this.imageSrc);
             this.showMessage(message, result, this.round, phrase);
             setTimeout(() => {
               window.location.href = '/game-over';
             }, 5000);
         } else {
-          const phrase = response.data.phrase;
+            const message = response.data.message;
+            const phrase = response.data.phrase;
+            this.removeTiles(this.round);
+            this.addImage(this.imageSrc);
             this.showRound(this.round, result);
             this.showMessage(message, result, this.round, phrase);
             setTimeout(() => {

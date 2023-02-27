@@ -168,6 +168,18 @@ def get_memes():
     else:
         return "Internal Server Error", 500
 
+@app.route('/api/caption-images', methods=['POST'])
+def caption_image():
+    """Get API list from Meme Generator API and send response to parseList function in JS"""
+    print("GET_MEMES CALLED!")
+    url = "https://api.imgflip.com/get_memes"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return jsonify(data)
+    else:
+        return "Internal Server Error", 500
+
 
 @app.route('/api/save-memes', methods=['POST'])
 def save_memes_to_db():
