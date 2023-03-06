@@ -1,5 +1,12 @@
 # CAPSTONE 1 - [Memeology](https://memeology.herokuapp.com/)
 
+### Getting Started:
+- conda activate py3.7.13 (or other shell that uses py3.7.13)
+- pip install venv
+- python venv source/bin/activate
+- pip install -r requirements.txt
+- flask run
+
 ## Function:
 Memeology (Meme-O) is 5-round guessing game. Users attempt to identify an iconic meme's phrase with only limited portion of the image viewable. The format is similar to Wordle, but is focused on visuals, like other Wordle spinoffs such as Frames. A user win's the game by submitting the correct guess in the submission box. In order to win, the user must guess one of the keywords from the meme's phrase before they are out of rounds. As the rounds progress (and the user guesses incorrectly), a larger portion of the meme's image becomes viewable. Once the game is completed, a record keeps track of the user's performance over time as well as the ability to 'favorite' the meme's image, generate their own and send to a friend.
 
@@ -40,5 +47,3 @@ Memeology (Meme-O) is 5-round guessing game. Users attempt to identify an iconic
  - Frontend: HTML - Jinja, CSS, JS, AXIOS
  - Backend: Flask, SQLAlchemy, WTForms
 
-
-### Getting Started:
