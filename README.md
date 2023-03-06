@@ -1,4 +1,4 @@
-# CAPSTONE 1 - (Memeology)[Link to Memeo]
+# CAPSTONE 1 - [Memeology](https://memeology.herokuapp.com/)
 
 ## Function:
 Memeology (Meme-O) is 5-round guessing game. Users attempt to identify an iconic meme's phrase with only limited portion of the image viewable. The format is similar to Wordle, but is focused on visuals, like other Wordle spinoffs such as Frames. A user win's the game by submitting the correct guess in the submission box. In order to win, the user must guess one of the keywords from the meme's phrase before they are out of rounds. As the rounds progress (and the user guesses incorrectly), a larger portion of the meme's image becomes viewable. Once the game is completed, a record keeps track of the user's performance over time as well as the ability to 'favorite' the meme's image, generate their own and send to a friend.
@@ -14,6 +14,8 @@ Memeology (Meme-O) is 5-round guessing game. Users attempt to identify an iconic
 - Posting Correct Answer
 
 ## User Flow:
+
+![User Flow](https://github.com/reckziegelwilliam96/capstone-1-memeology/blob/main/schema_design/Reckziegel%20Capstone%201%20-%20%20Visual%20User%20Flows.pdf?raw=true)
 - User Logins/Signs Up
 - Redirect to Home Page, Clicks on Instructions Page
 - Redirects to Instructions Page, Clicks on 'Start Game'
@@ -24,6 +26,10 @@ Memeology (Meme-O) is 5-round guessing game. Users attempt to identify an iconic
 - If game is over, full image is displayed and correct phrase.
 - Both correct guess and game over redirect to Game Over page
 - Game Over Page: Shows full meme with submission bars to generate top and bottom text. Once generated, a star icon to favorite the meme is an option. A bar graph is shown as well to show user's track record over time.
+
+## Database Schema:
+
+![Database Schema](https://github.com/reckziegelwilliam96/capstone-1-memeology/blob/main/schema_design/updated_database_schema.png?raw=true)
 
 ## API: (IMGFLIP API) [https://imgflip.com/api]
 - Two endpoints used, /get_memes and /caption_images. /get_memes used for gameplay (displaying image to be guessed) and /caption_images for gameover (to generate meme
