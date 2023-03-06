@@ -15,7 +15,7 @@ Memeology (Meme-O) is 5-round guessing game. Users attempt to identify an iconic
 
 ## User Flow:
 
-[embed]https://github.com/reckziegelwilliam96/capstone-1-memeology/blob/main/schema_design/Reckziegel%20Capstone%201%20-%20%20Visual%20User%20Flows.pdf[/embed]
+![User Flows](https://github.com/reckziegelwilliam96/capstone-1-memeology/blob/main/schema_design/Memeo%20User%20Flows.png?raw=true)
 - User Logins/Signs Up
 - Redirect to Home Page, Clicks on Instructions Page
 - Redirects to Instructions Page, Clicks on 'Start Game'
