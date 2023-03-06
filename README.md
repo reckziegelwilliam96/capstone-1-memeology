@@ -5,6 +5,8 @@
 - pip install venv
 - python venv source/bin/activate
 - pip install -r requirements.txt
+- CREATEDB memeo-app
+- python seed.py
 - flask run
 
 ## Function:
